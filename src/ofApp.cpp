@@ -4,8 +4,8 @@ int IMGX =500;
 int IMGY =500;
 int dither_type = 0;
 
-int x_r = 4;
-int y_r = 4;
+int x_r = 2;
+int y_r = 2;
 
 string filename = "images/face.png";
 
