@@ -18,7 +18,6 @@ void ofApp::setup(){
     res.update();
 
     ofPixels pix;
-    // ofLoadImage(pix, filename);
 
     ofPixelsRef pixels = res.getPixels();
 
@@ -36,23 +35,6 @@ void ofApp::update(){
 
     dither.dither_ordered(res, res, 8);
     res.getPixelsRef().resize(IMGX,IMGY,OF_INTERPOLATE_NEAREST_NEIGHBOR);
-
-    /*
-    for( int y=0; y<IMGY; y++ )
-        {
-         for( int x=0; x<IMGX; x++ )
-         {
-			int p = y * w + x;
-
-			int oldPx = imageOutPixels[ p ];
-			int newPx = oldPx < 127 ? 0 : 255;
-			imageOutPixels[ p ] = newPx;
-
-
-         }
-         }
-
-    */
 
     res.update();
 
