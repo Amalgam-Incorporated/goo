@@ -1,28 +1,38 @@
 #include "ofApp.h"
 
-int IMGX =500;
-int IMGY =500;
+int IMGX =1000;
+int IMGY =1000;
 int dither_type = 0;
 
 int x_r = 2;
 int y_r = 2;
+
+int frame = 0;
 
 string filename = "images/face.png";
 
 //--------------------------------------------------------------
 void ofApp::setup(){
 
+    ofSetFrameRate(60);
+
     res.allocate(IMGX, IMGY, OF_IMAGE_COLOR);
 
     res.load(filename);
     res.update();
 
-    ofPixels pix;
-
-    ofPixelsRef pixels = res.getPixels();
-
     IMGX = res.getWidth();
     IMGY = res.getHeight();
+
+    res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+    res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+    res.update();
+
+    dither.dither_ordered(res, res, 8);
+
+    res.getPixelsRef().resize(IMGX,IMGY,OF_INTERPOLATE_NEAREST_NEIGHBOR);
+
+    res.update();
 
 }
 
@@ -30,13 +40,38 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
 
-    res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+    ofPixels & pixels = res.getPixels();
+
+    int w = res.getWidth();
+    int h = res.getHeight();
+
+    for(int y=h-1; y>0; y--) {
+        for(int x=0; x<w; x++) {
+            if (frame > 8 * int(30 * x/w))
+            {
+                int i = y * w + x;
+                int m = 1;
+                if (frame % 2)
+                {
+                    m = 1+(7*y/h + 2+2*sin(TWO_PI * x/(w/20)));
+                }
+                int j = (y-m) * w + x;
+                if (j>0)
+                {
+                    pixels[i] = pixels[j];
+                }
+            }
+        }
+    }
+
+    for(int x=0; x<w; x++) {
+        pixels[x] = 0;
+        pixels[x+w] = 0;
+    }
+
     res.update();
 
-    dither.dither_ordered(res, res, 8);
-    res.getPixelsRef().resize(IMGX,IMGY,OF_INTERPOLATE_NEAREST_NEIGHBOR);
-
-    res.update();
+    frame++;
 
 }
 
