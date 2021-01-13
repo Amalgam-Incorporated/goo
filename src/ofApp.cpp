@@ -7,9 +7,11 @@ int dither_type = 0;
 int x_r = 2;
 int y_r = 2;
 
+int state = 0;
 int frame = 0;
 
-string filename = "images/face.png";
+string qr_filename = "images/face.png";
+string face_filename = "images/face.png";
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -18,7 +20,7 @@ void ofApp::setup(){
 
     res.allocate(IMGX, IMGY, OF_IMAGE_COLOR);
 
-    res.load(filename);
+    res.load(face_filename);
     res.update();
 
     IMGX = res.getWidth();
@@ -38,7 +40,51 @@ void ofApp::setup(){
 
 
 //--------------------------------------------------------------
+//
+
+void ofApp::wait_for_qr(){
+}
+
+void ofApp::show_qr(){
+}
+
+void ofApp::wait_for_face(){
+}
+
+void ofApp::show_face_melting(){
+}
+
 void ofApp::update(){
+
+
+    switch (state){
+
+        case 0:
+        // wait for qr code image
+        wait_for_qr();
+        state=1;
+        break;
+
+        case 1:
+        // show qr code image
+        show_qr();
+        state=2;
+        break;
+
+        case 2:
+        // wait for face image
+        wait_for_face();
+        state=3;
+        break;
+
+        case 3:
+        // show and melt face image, on/off gravel
+        show_face_melting();
+        state=0;
+        break;
+
+    }
+
 
     ofPixels & pixels = res.getPixels();
 
@@ -65,8 +111,8 @@ void ofApp::update(){
     }
 
     for(int x=0; x<w; x++) {
-        pixels[x] = 0;
-        pixels[x+w] = 0;
+        pixels[x] = 180;
+        pixels[x+w] = 180;
     }
 
     res.update();
@@ -84,12 +130,12 @@ void ofApp::draw(){
 void ofApp::keyPressed(int key){
 
     if(key == '0') {
-        res.load(filename);
+        res.load(face_filename);
         res.update();
         dither_type = 0;
 
     } else if (key == '1') {
-        res.load(filename);
+        res.load(face_filename);
         res.update();
         dither_type = 1;
 
@@ -98,7 +144,7 @@ void ofApp::keyPressed(int key){
 
     }
 
-    res.load(filename);
+    res.load(face_filename);
 
     if(key == OF_KEY_UP) {
         y_r++;

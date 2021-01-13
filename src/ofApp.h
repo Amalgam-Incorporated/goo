@@ -27,4 +27,10 @@ class ofApp : public ofBaseApp {
     ofImage res;
     ofxDither dither;
 
+private:
+    void wait_for_qr();
+    void show_qr();
+    void wait_for_face();
+    void show_face_melting();
+
 };
