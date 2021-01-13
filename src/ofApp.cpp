@@ -78,9 +78,9 @@ bool ofApp::show_face_melting(){
     int h = res.getHeight();
 
 
-    for(int y=h-1; y>0; y--) {
-        for(int x=0; x<w; x++) {
-            int band = int(30 * x/w);
+    for(int x=0; x<w; x++) {
+        int band = int(30 * x/w);
+        for(int y=h-1; y>0; y--) {
             if (frame > 8 * band)
             {
                 int i = y * w + x;
