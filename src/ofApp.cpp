@@ -7,7 +7,7 @@ int dither_type = 0;
 int x_r = 2;
 int y_r = 2;
 
-int state = 0;
+int state = 3;
 int frame = 0;
 
 string qr_filename = "images/face.png";
@@ -52,39 +52,6 @@ void ofApp::wait_for_face(){
 }
 
 void ofApp::show_face_melting(){
-}
-
-void ofApp::update(){
-
-
-    switch (state){
-
-        case 0:
-        // wait for qr code image
-        wait_for_qr();
-        state=1;
-        break;
-
-        case 1:
-        // show qr code image
-        show_qr();
-        state=2;
-        break;
-
-        case 2:
-        // wait for face image
-        wait_for_face();
-        state=3;
-        break;
-
-        case 3:
-        // show and melt face image, on/off gravel
-        show_face_melting();
-        state=0;
-        break;
-
-    }
-
 
     ofPixels & pixels = res.getPixels();
 
@@ -118,6 +85,40 @@ void ofApp::update(){
     res.update();
 
     frame++;
+
+
+}
+
+void ofApp::update(){
+
+
+    switch (state){
+
+        case 0:
+        // wait for qr code image
+        wait_for_qr();
+        state=1;
+        break;
+
+        case 1:
+        // show qr code image
+        show_qr();
+        state=2;
+        break;
+
+        case 2:
+        // wait for face image
+        wait_for_face();
+        state=3;
+        break;
+
+        case 3:
+        // show and melt face image, on/off gravel
+        show_face_melting();
+        state=0;
+        break;
+
+    }
 
 }
 
