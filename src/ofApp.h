@@ -25,12 +25,13 @@ class ofApp : public ofBaseApp {
 		void gotMessage(ofMessage msg);
 
     ofImage res;
+    ofImage qr;
     ofxDither dither;
 
 private:
-    void wait_for_qr();
-    void show_qr();
-    void wait_for_face();
-    void show_face_melting();
+    bool wait_for_qr();
+    bool show_qr();
+    bool wait_for_face();
+    bool show_face_melting();
 
 };
