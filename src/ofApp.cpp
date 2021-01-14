@@ -80,9 +80,16 @@ bool ofApp::show_face_melting(){
     ofPixels & pixels = res.getPixels();
 
     int band = min(bands-1, int(bands * frame*5/IMGX ));
-
     if (frame*5== int(band * IMGX/bands)) {
         printf("band %i on\n", band);
+    }
+
+    int band_off = min(bands-1, int(bands * (frame-framerate*5)*5/IMGX ));
+    if (band_off>=0 and (frame-framerate*5)*5 == int(band_off * IMGX/bands)) {
+        printf("band %i off\n", band_off);
+        if (band_off == 19){
+            return 1;
+        }
     }
 
     for(int x=0; x<(min((band+1)*(IMGX/bands),IMGX)); x++) {
@@ -163,6 +170,16 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 
+    if(key == 'p') {
+        if (state==3){
+            state=4;
+        }
+        else {
+            state =3;
+        }
+        return;
+    }
+
     if(key == '0') {
         res.load(face_filename);
         res.update();
@@ -192,6 +209,17 @@ void ofApp::keyPressed(int key){
 
     x_r = ofClamp(x_r, 1, 100);
     y_r = ofClamp(y_r, 1, 100);
+
+        res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+        res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+        res.update();
+
+        dither.dither_ordered(res, res, 8);
+
+        res.getPixelsRef().resize(IMGX,IMGY,OF_INTERPOLATE_NEAREST_NEIGHBOR);
+
+        res.update();
+
 }
 
 //--------------------------------------------------------------
