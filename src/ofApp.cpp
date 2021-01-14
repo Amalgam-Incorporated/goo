@@ -2,6 +2,11 @@
 
 int IMGX =1000;
 int IMGY =1000;
+
+int bands = 20;
+
+int framerate = 60;
+
 int dither_type = 0;
 
 int x_r = 2;
@@ -16,7 +21,7 @@ string face_filename = "images/face.png";
 //--------------------------------------------------------------
 void ofApp::setup(){
 
-    ofSetFrameRate(60);
+    ofSetFrameRate(framerate);
 
     res.allocate(IMGX, IMGY, OF_IMAGE_COLOR);
 }
@@ -74,33 +79,35 @@ bool ofApp::show_face_melting(){
 
     ofPixels & pixels = res.getPixels();
 
-    int w = res.getWidth();
-    int h = res.getHeight();
+    int band = min(bands-1, int(bands * frame*5/IMGX ));
 
+    if (frame*5== int(band * IMGX/bands)) {
+        printf("band %i on\n", band);
+    }
 
-    for(int x=0; x<w; x++) {
-        int band = int(30 * x/w);
-        for(int y=h-1; y>0; y--) {
-            if (frame > 8 * band)
+    for(int x=0; x<(min((band+1)*(IMGX/bands),IMGX)); x++) {
+
+        int m1 = 1+ int( 4* sin( PI * (x % int(IMGX/bands))/int(IMGX/bands)));
+
+        for(int y=IMGY-1; y>0; y--) {
+
+            int i = y * IMGX + x;
+            int m2 = 1;
+            if (frame % 2)
             {
-                int i = y * w + x;
-                int m = 1;
-                if (frame % 2)
-                {
-                    m = 1+(7*y/h + 2+2*sin(TWO_PI * x/(w/20)));
-                }
-                int j = (y-m) * w + x;
-                if (j>0)
-                {
-                    pixels[i] = pixels[j];
-                }
+                m2 = 1+(7*y/IMGY + m1);
+            }
+            int j = (y-m2) * IMGX + x;
+            if (j>0)
+            {
+                pixels[i] = pixels[j];
             }
         }
     }
 
-    for(int x=0; x<w; x++) {
+    for(int x=0; x<IMGX; x++) {
         pixels[x] = 180;
-        pixels[x+w] = 180;
+        pixels[x+IMGX] = 180;
     }
 
     res.update();
