@@ -72,6 +72,9 @@ bool ofApp::wait_for_face(){
 }
 
 
+void ofApp::band_control(int band, const char* msg){
+        printf("band %i %s\n", band, msg);
+}
 
 bool ofApp::show_face_melting(){
     // show the face, start the melt, turn on the gravel
@@ -81,12 +84,12 @@ bool ofApp::show_face_melting(){
 
     int band = min(bands-1, int(bands * frame*5/IMGX ));
     if (frame*5== int(band * IMGX/bands)) {
-        printf("band %i on\n", band);
+        band_control(band, "on");
     }
 
     int band_off = min(bands-1, int(bands * (frame-framerate*5)*5/IMGX ));
     if (band_off>=0 and (frame-framerate*5)*5 == int(band_off * IMGX/bands)) {
-        printf("band %i off\n", band_off);
+        band_control(band_off, "off");
         if (band_off == 19){
             return 1;
         }

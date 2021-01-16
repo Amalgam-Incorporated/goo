@@ -32,6 +32,9 @@ private:
     bool wait_for_qr();
     bool show_qr();
     bool wait_for_face();
+
+    void band_control(int band, const char* msg);
+
     bool show_face_melting();
 
 };
