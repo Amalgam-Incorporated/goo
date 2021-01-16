@@ -24,6 +24,16 @@ void ofApp::setup(){
     ofSetFrameRate(framerate);
 
     res.allocate(IMGX, IMGY, OF_IMAGE_COLOR);
+
+    ofRegisterURLNotification(this);
+}
+
+void ofApp::urlResponse(ofHttpResponse &httpResponse){
+    printf("httpResponse.status: %i\n", httpResponse.status);
+  // if(httpResponse.request.getID() == loadXmlId && httpResponse.status==200 ){  // i.e is it ok
+  //  xml.loadFromBuffer(httpResponse.data.getText());
+  //  processXml();
+  //}
 }
 
 
@@ -73,7 +83,11 @@ bool ofApp::wait_for_face(){
 
 
 void ofApp::band_control(int band, const char* msg){
+
         printf("band %i %s\n", band, msg);
+        string url = "http://localhost:8082/";
+        int id = ofLoadURLAsync(url);
+
 }
 
 bool ofApp::show_face_melting(){
