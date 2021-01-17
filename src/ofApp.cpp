@@ -31,8 +31,6 @@ void ofApp::setup(){
 void ofApp::urlResponse(ofHttpResponse &httpResponse){
     printf("httpResponse.status: %i\n", httpResponse.status);
   // if(httpResponse.request.getID() == loadXmlId && httpResponse.status==200 ){  // i.e is it ok
-  //  xml.loadFromBuffer(httpResponse.data.getText());
-  //  processXml();
   //}
 }
 
@@ -85,10 +83,26 @@ bool ofApp::wait_for_face(){
 
 void ofApp::band_control(int band, const char* msg){
 
-        printf("band %i %s\n", band, msg);
-        string url = "http://localhost:8082/band/" +
-            to_string(band) + "/" + msg;
-        int id = ofLoadURLAsync(url);
+    printf("band %i %s\n", band, msg);
+
+    ofHttpRequest request;
+    request.method = ofHttpRequest::POST;
+    request.url = "http://localhost:8082/api/";
+    string payload = "{ "
+        "\"band\": " + to_string(band) + ", "
+        "\"msg\": \""+msg+"\""
+        "}";
+
+    printf("payload: %s\n", payload.c_str());
+
+    request.url = "http://localhost:8082/api/";
+    request.body = payload;
+
+    ofURLFileLoader http;
+    auto response = http.handleRequest(request);
+    ofLogNotice() << response.status << std::endl;
+    ofLogNotice() << response.data.getText() << std::endl;
+
 }
 
 bool ofApp::show_face_melting(){
@@ -106,6 +120,7 @@ bool ofApp::show_face_melting(){
     if (band_off>=0 and (frame-framerate*5)*5 == int(band_off * IMGX/bands)) {
         band_control(band_off, "off");
         if (band_off == 19){
+            band_control(-1, "unlock");
             return 1;
         }
     }
