@@ -41,6 +41,7 @@ void ofApp::urlResponse(ofHttpResponse &httpResponse){
 //
 
 bool ofApp::wait_for_qr(){
+
     if (qr.load(qr_filename))
     {
         return 1;
@@ -85,9 +86,9 @@ bool ofApp::wait_for_face(){
 void ofApp::band_control(int band, const char* msg){
 
         printf("band %i %s\n", band, msg);
-        string url = "http://localhost:8082/";
+        string url = "http://localhost:8082/band/" +
+            to_string(band) + "/" + msg;
         int id = ofLoadURLAsync(url);
-
 }
 
 bool ofApp::show_face_melting(){
@@ -187,55 +188,68 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 
-    if(key == 'p') {
-        if (state==3){
-            state=4;
-        }
-        else {
-            state =3;
-        }
-        return;
-    }
+	switch (key) {
 
-    if(key == '0') {
-        res.load(face_filename);
-        res.update();
-        dither_type = 0;
+		case ' ':
+			break;
 
-    } else if (key == '1') {
-        res.load(face_filename);
-        res.update();
-        dither_type = 1;
+		case 'f':
+			ofToggleFullscreen();
+			break;
 
-    } else if (key == 's') {
-        res.save("result_" + ofGetTimestampString() + ".png");
+		case 'p':
+            if (state==3){
+                state=4;
+            }
+            else {
+                state =3;
+            }
+            return;
+			break;
 
+		case '0':
+            res.load(face_filename);
+            res.update();
+            dither_type = 0;
+			break;
+		case '1':
+            res.load(face_filename);
+            res.update();
+            dither_type = 1;
+			break;
+
+		case 's':
+            res.save("result_" + ofGetTimestampString() + ".png");
+            break;
+
+		case OF_KEY_UP:
+            y_r++;
+            break;
+		case OF_KEY_DOWN:
+            y_r--;
+            break;
+		case OF_KEY_LEFT:
+            x_r--;
+            break;
+		case OF_KEY_RIGHT:
+            x_r++;
+            break;
     }
 
     res.load(face_filename);
 
-    if(key == OF_KEY_UP) {
-        y_r++;
-    } else if (key == OF_KEY_DOWN) {
-        y_r--;
-    } else if (key == OF_KEY_LEFT) {
-        x_r--;
-    } else if (key == OF_KEY_RIGHT) {
-        x_r++;
-    }
-
     x_r = ofClamp(x_r, 1, 100);
     y_r = ofClamp(y_r, 1, 100);
 
-        res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
-        res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
-        res.update();
+    res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+    res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+    res.update();
 
-        dither.dither_ordered(res, res, 8);
+    dither.dither_ordered(res, res, 8);
 
-        res.getPixelsRef().resize(IMGX,IMGY,OF_INTERPOLATE_NEAREST_NEIGHBOR);
+    res.getPixelsRef().resize(IMGX,IMGY,OF_INTERPOLATE_NEAREST_NEIGHBOR);
 
-        res.update();
+    res.update();
 
 }
 
