@@ -56,7 +56,10 @@ bool ofApp::show_qr(){
 
 bool ofApp::wait_for_face(){
 
-    if (res.load(face_filename))
+    ofImageLoadSettings settings;
+    settings.exifRotate=true;
+
+    if (res.load(face_filename, settings))
     {
         res.update();
 
