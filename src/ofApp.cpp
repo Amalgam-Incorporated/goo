@@ -23,6 +23,7 @@ int frame = 0;
 
 string qr_filename = "images/qr.png";
 string face_filename = "images/face.png";
+string ticket_no;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -36,7 +37,7 @@ void ofApp::setup(){
     ofRegisterURLNotification(this);
 }
 
-void ofApp::urlResponse(ofHttpResponse &httpResponse){
+void ofApp::xurlResponse(ofHttpResponse &httpResponse){
     printf("httpResponse.status: %i\n", httpResponse.status);
     printf("httpResponse.data: %s\n", httpResponse.data);
     if (state == WAIT_FOR_TICKET) {
