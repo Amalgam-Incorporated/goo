@@ -31,7 +31,10 @@ class ofApp : public ofBaseApp {
 
     ofxDither dither;
 
+    ofTrueTypeFont  verdana14;
+
 private:
+    bool request_ticket();
     bool wait_for_qr();
     bool show_qr();
     bool wait_for_face();

@@ -12,7 +12,13 @@ int dither_type = 0;
 int x_r = 2;
 int y_r = 2;
 
-int state = 0;
+enum {
+    PAUSE,
+    REQUEST_TICKET,
+    WAIT_FOR_TICKET,
+    WAIT_FOR_FACE,
+    MELT_FACE } state = REQUEST_TICKET;
+
 int frame = 0;
 
 string qr_filename = "images/qr.png";
@@ -25,11 +31,17 @@ void ofApp::setup(){
 
     res.allocate(IMGX, IMGY, OF_IMAGE_COLOR);
 
+    verdana14.load("verdana.ttf", 14, true, true);
+
     ofRegisterURLNotification(this);
 }
 
 void ofApp::urlResponse(ofHttpResponse &httpResponse){
     printf("httpResponse.status: %i\n", httpResponse.status);
+    printf("httpResponse.data: %s\n", httpResponse.data);
+    if (state == WAIT_FOR_TICKET) {
+        state = WAIT_FOR_FACE;
+    }
   // if(httpResponse.request.getID() == loadXmlId && httpResponse.status==200 ){  // i.e is it ok
   //}
 }
@@ -37,6 +49,25 @@ void ofApp::urlResponse(ofHttpResponse &httpResponse){
 
 //--------------------------------------------------------------
 //
+
+bool ofApp::request_ticket(){
+
+    ofHttpRequest request;
+    request.method = ofHttpRequest::GET;
+    request.url = "http://localhost:8087/api/ticket/next";
+    string payload = "{ "
+        "}";
+
+    request.body = payload;
+
+    ofURLFileLoader http;
+    auto response = http.handleRequest(request);
+    ofLogNotice() << response.status << std::endl;
+    ofLogNotice() << response.data.getText() << std::endl;
+
+    return true;
+
+}
 
 bool ofApp::wait_for_qr(){
 
@@ -48,6 +79,7 @@ bool ofApp::wait_for_qr(){
 }
 
 bool ofApp::show_qr(){
+
 
     res.update();
     return true;
@@ -89,20 +121,17 @@ void ofApp::band_control(int band, const char* msg){
     printf("band %i %s\n", band, msg);
 
     ofHttpRequest request;
+
     request.method = ofHttpRequest::POST;
-    request.url = "http://localhost:8082/api/";
+    request.url = "http://localhost:8087/api/rock/";
     string payload = "{ "
         "\"band\": " + to_string(band) + ", "
         "\"msg\": \""+msg+"\""
         "}";
 
-    printf("payload: %s\n", payload.c_str());
-
-    request.url = "http://localhost:8082/api/";
-    request.body = payload;
-
     ofURLFileLoader http;
     auto response = http.handleRequest(request);
+
     ofLogNotice() << response.status << std::endl;
     ofLogNotice() << response.data.getText() << std::endl;
 
@@ -163,34 +192,33 @@ bool ofApp::show_face_melting(){
 
 void ofApp::update(){
 
-
     switch (state){
 
-        case 0:
+        case REQUEST_TICKET:
         // wait for qr code image
-        if (wait_for_qr()){
-            state=1;
+        if (request_ticket()){
+            state=WAIT_FOR_TICKET;
         }
         break;
 
-        case 1:
+        case WAIT_FOR_TICKET:
         // show qr code image
         if (show_qr()){
-            state=2;
+            state=WAIT_FOR_FACE;
         }
         break;
 
-        case 2:
+        case WAIT_FOR_FACE:
         // wait for face image
         if (wait_for_face()){
-            state=3;
+            state=MELT_FACE;
         }
         break;
 
-        case 3:
+        case MELT_FACE:
         // show and melt face image, on/off gravel
         if (show_face_melting()){
-            state=0;
+            state=REQUEST_TICKET;
         }
         break;
 
@@ -200,7 +228,12 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    res.draw(0, 0);
+
+    if (state == WAIT_FOR_TICKET) {
+        res.draw(200, 50);
+        verdana14.drawString("Your banner ad here.", 300, 600);
+    }
+    // res.draw(0, 0);
 }
 
 //--------------------------------------------------------------
@@ -217,10 +250,10 @@ void ofApp::keyPressed(int key){
 
 		case 'p':
             if (state==3){
-                state=4;
+                state=PAUSE;
             }
             else {
-                state =3;
+                state =MELT_FACE;
             }
             return;
 			break;
