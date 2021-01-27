@@ -27,7 +27,8 @@ class ofApp : public ofBaseApp {
     void urlResponse(ofHttpResponse &httpResponse);
 
     ofImage res;
-    ofImage qr;
+    ofImage res2;
+
     ofxDither dither;
 
 private:

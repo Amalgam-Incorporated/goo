@@ -40,18 +40,17 @@ void ofApp::urlResponse(ofHttpResponse &httpResponse){
 
 bool ofApp::wait_for_qr(){
 
-    if (qr.load(qr_filename))
+    if (res.load(qr_filename))
     {
-        return 1;
+        return true;
     }
-    else
-    {
-        return 0;
-    }
+    return false;
 }
 
 bool ofApp::show_qr(){
-    return 1;
+
+    res.update();
+    return true;
 }
 
 bool ofApp::wait_for_face(){
@@ -59,8 +58,9 @@ bool ofApp::wait_for_face(){
     ofImageLoadSettings settings;
     settings.exifRotate=true;
 
-    if (res.load(face_filename, settings))
+    if (res2.load(face_filename, settings))
     {
+        res = res2;
         res.update();
 
         res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
@@ -75,11 +75,11 @@ bool ofApp::wait_for_face(){
 
         frame=0;
 
-        return 1;
+        return true;
     }
     else
     {
-        return 0;
+        return false;
     }
 }
 
@@ -124,7 +124,7 @@ bool ofApp::show_face_melting(){
         band_control(band_off, "off");
         if (band_off == 19){
             band_control(-1, "unlock");
-            return 1;
+            return true;
         }
     }
 
@@ -157,7 +157,7 @@ bool ofApp::show_face_melting(){
 
     frame++;
 
-    return 0;
+    return false;
 
 }
 
