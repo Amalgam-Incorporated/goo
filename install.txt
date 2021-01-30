@@ -1,0 +1,26 @@
+# make the usb stick, install a bare system:
+https://debconf-video-team.pages.debian.net/ansible/usb_install/usb_quick_start.html
+hostname: bare
+
+# add keys
+sudo -i
+apt install ssh-import-id
+ssh-keygen
+ssh-import-id gh:CarlFK
+
+# ansible the box
+cd ~/src/l3dfx/kilb/nerfherder
+./ans-it.sh -l enuk
+
+# instal OF deps
+sudo goo/install_dependencies.sh
+
+# install goo
+cd ~/src/alg/goo
+rsync -rtvP bin videoteam@enuk:goo
+
+# off we go
+sudo reboot
+
+# restart goo
+sudo systemctl restart lightdm.service
