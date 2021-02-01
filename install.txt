@@ -7,6 +7,8 @@ sudo -i
 apt install ssh-import-id
 ssh-keygen
 ssh-import-id gh:CarlFK
+# change hostname to enuk
+vim /etc/hosts /etc/hostname
 
 # ansible the box
 cd ~/src/l3dfx/kilb/nerfherder
