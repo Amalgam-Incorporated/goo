@@ -24,7 +24,7 @@ class ofApp : public ofBaseApp {
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-    void urlResponse(ofHttpResponse &httpResponse);
+    // void urlResponse(ofHttpResponse &httpResponse);
 
     ofImage res;
     ofImage res2;

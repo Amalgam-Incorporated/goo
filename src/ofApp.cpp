@@ -16,13 +16,15 @@ enum {
     PAUSE,
     REQUEST_TICKET,
     WAIT_FOR_TICKET,
+    WAIT_FOR_QR,
+    SHOW_QR,
     WAIT_FOR_FACE,
     MELT_FACE } state = REQUEST_TICKET;
 
 int frame = 0;
 
 string qr_filename = "images/qr.png";
-string face_filename = "images/face.png";
+string face_filename = "images/selfie";
 string ticket_no;
 
 //--------------------------------------------------------------
@@ -34,10 +36,11 @@ void ofApp::setup(){
 
     verdana14.load("verdana.ttf", 14, true, true);
 
-    ofRegisterURLNotification(this);
+    // ofRegisterURLNotification(this);
 }
 
-void ofApp::xurlResponse(ofHttpResponse &httpResponse){
+/*
+void ofApp::urlResponse(ofHttpResponse &httpResponse){
     printf("httpResponse.status: %i\n", httpResponse.status);
     printf("httpResponse.data: %s\n", httpResponse.data);
     if (state == WAIT_FOR_TICKET) {
@@ -47,6 +50,7 @@ void ofApp::xurlResponse(ofHttpResponse &httpResponse){
   //}
 }
 
+*/
 
 //--------------------------------------------------------------
 //
@@ -54,8 +58,8 @@ void ofApp::xurlResponse(ofHttpResponse &httpResponse){
 bool ofApp::request_ticket(){
 
     ofHttpRequest request;
-    request.method = ofHttpRequest::GET;
-    request.url = "http://localhost:8087/api/ticket/next";
+    request.method = ofHttpRequest::POST;
+    request.url = "http://localhost/of/nextTicket";
     string payload = "{ "
         "}";
 
@@ -63,8 +67,11 @@ bool ofApp::request_ticket(){
 
     ofURLFileLoader http;
     auto response = http.handleRequest(request);
+
     ofLogNotice() << response.status << std::endl;
     ofLogNotice() << response.data.getText() << std::endl;
+
+    ticket_no = response.data.getText();
 
     return true;
 
@@ -80,7 +87,6 @@ bool ofApp::wait_for_qr(){
 }
 
 bool ofApp::show_qr(){
-
 
     res.update();
     return true;
@@ -118,13 +124,15 @@ bool ofApp::wait_for_face(){
 
 
 void ofApp::band_control(int band, const char* msg){
+    // Each servo has an endpoint of the format: [root]/hardware/servos/[servoNumber]/[command]
 
     printf("band %i %s\n", band, msg);
 
     ofHttpRequest request;
 
     request.method = ofHttpRequest::POST;
-    request.url = "http://localhost:8087/api/rock/";
+    request.url = "http://localhost/hardware/servos/" +
+        to_string(band) + "/" + msg;
     string payload = "{ "
         "\"band\": " + to_string(band) + ", "
         "\"msg\": \""+msg+"\""
@@ -146,14 +154,14 @@ bool ofApp::show_face_melting(){
 
     int band = min(bands-1, int(bands * frame*5/IMGX ));
     if (frame*5== int(band * IMGX/bands)) {
-        band_control(band, "on");
+        band_control(band, "open");
     }
 
     int band_off = min(bands-1, int(bands * (frame-framerate*5)*5/IMGX ));
     if (band_off>=0 and (frame-framerate*5)*5 == int(band_off * IMGX/bands)) {
-        band_control(band_off, "off");
+        band_control(band_off, "close");
         if (band_off == 19){
-            band_control(-1, "unlock");
+            // band_control(-1, "unlock");
             return true;
         }
     }
@@ -179,8 +187,8 @@ bool ofApp::show_face_melting(){
     }
 
     for(int x=0; x<IMGX; x++) {
-        pixels[x] = 180;
-        pixels[x+IMGX] = 180;
+        pixels[x] = 255;
+        pixels[x+IMGX] = 255;
     }
 
     res.update();
@@ -196,13 +204,21 @@ void ofApp::update(){
     switch (state){
 
         case REQUEST_TICKET:
-        // wait for qr code image
+        //
         if (request_ticket()){
-            state=WAIT_FOR_TICKET;
+            // state=WAIT_FOR_TICKET;
+            state=WAIT_FOR_QR;
         }
         break;
 
-        case WAIT_FOR_TICKET:
+        case WAIT_FOR_QR:
+        // show qr code image
+        if (wait_for_qr()){
+            state=SHOW_QR;
+        }
+        break;
+
+        case SHOW_QR:
         // show qr code image
         if (show_qr()){
             state=WAIT_FOR_FACE;
@@ -230,11 +246,19 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-    if (state == WAIT_FOR_TICKET) {
-        res.draw(200, 50);
-        verdana14.drawString("Your banner ad here.", 300, 600);
+    switch (state){
+
+        case SHOW_QR:
+        case WAIT_FOR_FACE:
+            res.draw(200, 50);
+            verdana14.drawString("Your banner ad here.", 300, 600);
+            verdana14.drawString(ticket_no, 400, 650);
+        break;
+
+        case MELT_FACE:
+            res.draw(0, 0);
+        break;
     }
-    // res.draw(0, 0);
 }
 
 //--------------------------------------------------------------
