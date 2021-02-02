@@ -1,14 +1,11 @@
 #include "ofApp.h"
 
-int IMGX =2160;
+int IMGX =3840;
 int IMGY =2160;
-
-int qr_x=1100;
-int qr_y=250;
 
 int bands = 20;
 int framerate = 60;
-int melt_time = 10;
+int melt_time = 4;
 
 int total_frames = framerate*melt_time;
 
@@ -31,7 +28,13 @@ int frame = 0;
 string qr_filename = "images/qr.png";
 string bg_filename = "images/bg.png";
 
+int bg_x=800;
+int bg_y=0; // not used now
+
 string face_filename = "images/selfie";
+
+int face_x=700;
+int face_y=0;
 
 string ticket_no;
 
@@ -44,7 +47,7 @@ void ofApp::setup(){
 
     verdana14.load("verdana.ttf", 14, true, true);
 
-    bg.load(qr_filename);
+    bg.load(bg_filename);
 
 }
 
@@ -163,12 +166,16 @@ bool ofApp::show_face_melting(){
         if (( 0 <= band-8) && (band-8 <= bands-1)) {
             // if the band number is in the close range
             band_control(band-8, "close");
+            if (band-8 == bands-1){
+                return true;
+            }
         }
     }
 
     for(int x=0; x<(min((band+1)*(IMGX/bands),IMGX)); x++) {
 
-        int m1 = 1+ int( 8* sin( PI * (x % int(IMGX/bands))/int(IMGX/bands)));
+        // int m1 = 1+ int( 8* sin( PI * (x % int(IMGX/bands))/int(IMGX/bands)));
+        int m1 = 5+ int( 8* sin( PI * (x % int(IMGX/bands))/int(IMGX/bands)));
 
         for(int y=IMGY-1; y>0; y--) {
 
@@ -250,14 +257,14 @@ void ofApp::draw(){
 
         case SHOW_QR:
         case WAIT_FOR_FACE:
-            // res.draw(1200, 250);
-            res.draw(qr_x, qr_y);
+            bg.draw(0, 0);
+            res.draw(bg_x+580, 500 );
             // verdana14.drawString("Your banner ad here.", 300, 600);
             verdana14.drawString(ticket_no, 1000, 1650);
         break;
 
         case MELT_FACE:
-            res.draw(0, 0);
+            res.draw(face_x, face_y);
         break;
     }
 }
@@ -300,17 +307,22 @@ void ofApp::keyPressed(int key){
             break;
 
 		case 'i':
-            qr_x--;
-            printf("%i",qr_x);
+            bg_y -= 10;
             break;
 		case 'j':
-            qr_y--;
+            bg_x -= 1;
+            break;
+		case 'J':
+            bg_x -= 50;
             break;
 		case 'k':
-            qr_y++;
+            bg_x += 1;
+            break;
+		case 'K':
+            bg_x += 50;
             break;
 		case 'm':
-            qr_x++;
+            bg_y += 10;
             break;
 
 		case OF_KEY_UP:
@@ -327,20 +339,10 @@ void ofApp::keyPressed(int key){
             break;
     }
 
-    res.load(face_filename);
+    printf("%i, %i", bg_x, bg_y);
 
     x_r = ofClamp(x_r, 1, 100);
     y_r = ofClamp(y_r, 1, 100);
-
-    res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
-    res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
-    res.update();
-
-    dither.dither_ordered(res, res, 8);
-
-    res.getPixelsRef().resize(IMGX,IMGY,OF_INTERPOLATE_NEAREST_NEIGHBOR);
-
-    res.update();
 
 }
 
