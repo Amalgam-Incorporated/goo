@@ -28,6 +28,7 @@ class ofApp : public ofBaseApp {
 
     ofImage res;
     ofImage res2;
+    ofImage bg;
 
     ofxDither dither;
 

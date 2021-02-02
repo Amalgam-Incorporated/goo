@@ -1,11 +1,16 @@
 #include "ofApp.h"
 
-int IMGX =1000;
-int IMGY =1000;
+int IMGX =2160;
+int IMGY =2160;
+
+int qr_x=1100;
+int qr_y=250;
 
 int bands = 20;
-
 int framerate = 60;
+int melt_time = 10;
+
+int total_frames = framerate*melt_time;
 
 int dither_type = 0;
 
@@ -24,7 +29,10 @@ enum {
 int frame = 0;
 
 string qr_filename = "images/qr.png";
+string bg_filename = "images/bg.png";
+
 string face_filename = "images/selfie";
+
 string ticket_no;
 
 //--------------------------------------------------------------
@@ -36,21 +44,9 @@ void ofApp::setup(){
 
     verdana14.load("verdana.ttf", 14, true, true);
 
-    // ofRegisterURLNotification(this);
-}
+    bg.load(qr_filename);
 
-/*
-void ofApp::urlResponse(ofHttpResponse &httpResponse){
-    printf("httpResponse.status: %i\n", httpResponse.status);
-    printf("httpResponse.data: %s\n", httpResponse.data);
-    if (state == WAIT_FOR_TICKET) {
-        state = WAIT_FOR_FACE;
-    }
-  // if(httpResponse.request.getID() == loadXmlId && httpResponse.status==200 ){  // i.e is it ok
-  //}
 }
-
-*/
 
 //--------------------------------------------------------------
 //
@@ -152,23 +148,27 @@ bool ofApp::show_face_melting(){
 
     ofPixels & pixels = res.getPixels();
 
-    int band = min(bands-1, int(bands * frame*5/IMGX ));
-    if (frame*5== int(band * IMGX/bands)) {
-        band_control(band, "open");
-    }
-
-    int band_off = min(bands-1, int(bands * (frame-framerate*5)*5/IMGX ));
-    if (band_off>=0 and (frame-framerate*5)*5 == int(band_off * IMGX/bands)) {
-        band_control(band_off, "close");
-        if (band_off == 19){
-            // band_control(-1, "unlock");
-            return true;
+    // band in motion.  goes from 0 to 40 (2x bands count)
+    // capped at bands count-1, so 0 to 19
+    // int band = min(bands-1, int(bands * frame*5/IMGX ));
+    // 60fps x 10s = 600 frames.
+    // 600 frames / 20 bands = 30 frames per band
+    int band = int(frame/(total_frames/bands));
+    if  (frame*bands==band*total_frames) {
+        // If we have transitioned from one band to another
+        if (( 0 <= band ) && (band <= bands-1)) {
+            // if the band number is in the open range
+            band_control(band, "open");
+        }
+        if (( 0 <= band-8) && (band-8 <= bands-1)) {
+            // if the band number is in the close range
+            band_control(band-8, "close");
         }
     }
 
     for(int x=0; x<(min((band+1)*(IMGX/bands),IMGX)); x++) {
 
-        int m1 = 1+ int( 4* sin( PI * (x % int(IMGX/bands))/int(IMGX/bands)));
+        int m1 = 1+ int( 8* sin( PI * (x % int(IMGX/bands))/int(IMGX/bands)));
 
         for(int y=IMGY-1; y>0; y--) {
 
@@ -250,9 +250,10 @@ void ofApp::draw(){
 
         case SHOW_QR:
         case WAIT_FOR_FACE:
-            res.draw(200, 50);
-            verdana14.drawString("Your banner ad here.", 300, 600);
-            verdana14.drawString(ticket_no, 400, 650);
+            // res.draw(1200, 250);
+            res.draw(qr_x, qr_y);
+            // verdana14.drawString("Your banner ad here.", 300, 600);
+            verdana14.drawString(ticket_no, 1000, 1650);
         break;
 
         case MELT_FACE:
@@ -274,7 +275,7 @@ void ofApp::keyPressed(int key){
 			break;
 
 		case 'p':
-            if (state==3){
+            if (state==MELT_FACE){
                 state=PAUSE;
             }
             else {
@@ -296,6 +297,20 @@ void ofApp::keyPressed(int key){
 
 		case 's':
             res.save("result_" + ofGetTimestampString() + ".png");
+            break;
+
+		case 'i':
+            qr_x--;
+            printf("%i",qr_x);
+            break;
+		case 'j':
+            qr_y--;
+            break;
+		case 'k':
+            qr_y++;
+            break;
+		case 'm':
+            qr_x++;
             break;
 
 		case OF_KEY_UP:
