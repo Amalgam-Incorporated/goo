@@ -4,4 +4,7 @@ qr.png
 selfie
 
 
+ofxDither comes from
+https://github.com/danbz/ofxDither
+
 

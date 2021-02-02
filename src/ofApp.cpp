@@ -1,7 +1,7 @@
 #include "ofApp.h"
 
-int IMGX =3840;
-int IMGY =2160;
+int IMGX =1000;
+int IMGY =1000;
 
 int bands = 20;
 int framerate = 60;
@@ -11,8 +11,8 @@ int total_frames = framerate*melt_time;
 
 int dither_type = 0;
 
-int x_r = 2;
-int y_r = 2;
+int x_r = 1;
+int y_r = 1;
 
 enum {
     PAUSE,
@@ -262,9 +262,10 @@ void ofApp::draw(){
             // verdana14.drawString("Your banner ad here.", 300, 600);
             verdana14.drawString(ticket_no, 1000, 1650);
         break;
-
         case MELT_FACE:
             res.draw(face_x, face_y);
+            ofDrawBitmapString("fps: " +
+                    ofToString((int)ofGetFrameRate()), 20, 20);
         break;
     }
 }
