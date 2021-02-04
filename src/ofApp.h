@@ -32,7 +32,8 @@ class ofApp : public ofBaseApp {
 
     ofxDither dither;
 
-    ofTrueTypeFont  verdana14;
+    // ofTrueTypeFont  verdana14;
+    ofTrueTypeFont  pdu14;
 
 private:
     bool request_ticket();

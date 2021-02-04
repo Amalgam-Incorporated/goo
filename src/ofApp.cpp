@@ -1,11 +1,12 @@
 #include "ofApp.h"
 
-int IMGX =1000;
-int IMGY =1000;
+int IMGX =1050;
+int IMGY =1050;
 
 int bands = 20;
 int framerate = 60;
 int melt_time = 4;
+int close_lag = 19;
 
 int total_frames = framerate*melt_time;
 
@@ -33,7 +34,7 @@ int bg_y=0; // not used now
 
 string face_filename = "images/selfie";
 
-int face_x=700;
+int face_x=290;
 int face_y=0;
 
 string ticket_no;
@@ -45,7 +46,9 @@ void ofApp::setup(){
 
     res.allocate(IMGX, IMGY, OF_IMAGE_COLOR);
 
-    verdana14.load("verdana.ttf", 14, true, true);
+    // verdana14.load("verdana.ttf", 14, true, true);
+    pdu14.load("pdu-regular.otf", 42, true, true);
+    // ofBackground(255);
 
     bg.load(bg_filename);
 
@@ -163,10 +166,10 @@ bool ofApp::show_face_melting(){
             // if the band number is in the open range
             band_control(band, "open");
         }
-        if (( 0 <= band-8) && (band-8 <= bands-1)) {
+        if (( 0 <= band-close_lag) && (band-close_lag <= bands-1)) {
             // if the band number is in the close range
-            band_control(band-8, "close");
-            if (band-8 == bands-1){
+            band_control(band-close_lag, "close");
+            if (band-close_lag == bands-1){
                 return true;
             }
         }
@@ -257,10 +260,14 @@ void ofApp::draw(){
 
         case SHOW_QR:
         case WAIT_FOR_FACE:
-            bg.draw(0, 0);
-            res.draw(bg_x+580, 500 );
+            bg.draw(0, 0, 1680,1050);
+            // res.draw(bg_x+580,500);
+            // res.draw((bg_x+580)/2.35,500/2.35, 470,470   );
+            res.draw(588,210, 470,470 );
             // verdana14.drawString("Your banner ad here.", 300, 600);
-            verdana14.drawString(ticket_no, 1000, 1650);
+            ofSetColor(0);
+            pdu14.drawString(ticket_no, 775, 700);
+            ofSetColor(255);
         break;
         case MELT_FACE:
             res.draw(face_x, face_y);
