@@ -40,6 +40,7 @@ private:
     bool wait_for_qr();
     bool show_qr();
     bool wait_for_face();
+    bool show_face();
 
     void band_control(int band, const char* msg);
 

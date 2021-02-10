@@ -22,6 +22,7 @@ enum {
     WAIT_FOR_QR,
     SHOW_QR,
     WAIT_FOR_FACE,
+    SHOW_FACE,
     MELT_FACE } state = REQUEST_TICKET;
 
 int frame = 0;
@@ -90,7 +91,6 @@ bool ofApp::wait_for_qr(){
 
 bool ofApp::show_qr(){
 
-    res.update();
     return true;
 }
 
@@ -102,7 +102,6 @@ bool ofApp::wait_for_face(){
     if (res2.load(face_filename, settings))
     {
         res = res2;
-        res.update();
 
         res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
         res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
@@ -124,6 +123,19 @@ bool ofApp::wait_for_face(){
     }
 }
 
+bool ofApp::show_face(){
+    frame++;
+    // printf("frame %i \n", frame);
+    if (frame==60)
+    {
+        frame=0;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 
 void ofApp::band_control(int band, const char* msg){
     // Each servo has an endpoint of the format: [root]/hardware/servos/[servoNumber]/[command]
@@ -238,6 +250,12 @@ void ofApp::update(){
         case WAIT_FOR_FACE:
         // wait for face image
         if (wait_for_face()){
+            state=SHOW_FACE;
+        }
+        break;
+
+        case SHOW_FACE: // show face image and pause
+        if (show_face()){
             state=MELT_FACE;
         }
         break;
@@ -269,6 +287,7 @@ void ofApp::draw(){
             pdu14.drawString(ticket_no, 775, 700);
             ofSetColor(255);
         break;
+        case SHOW_FACE:
         case MELT_FACE:
             res.draw(face_x, face_y);
             ofDrawBitmapString("fps: " +
