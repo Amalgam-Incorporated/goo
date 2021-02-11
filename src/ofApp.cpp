@@ -126,7 +126,7 @@ bool ofApp::wait_for_face(){
 bool ofApp::show_face(){
     frame++;
     // printf("frame %i \n", frame);
-    if (frame==60)
+    if (frame==60*3)
     {
         frame=0;
         return true;
