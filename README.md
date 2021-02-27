@@ -7,4 +7,4 @@ selfie
 ofxDither comes from
 https://github.com/danbz/ofxDither
 
-
+Copywrite 2021 Amalgam Incorporated
