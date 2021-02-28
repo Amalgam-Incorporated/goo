@@ -101,14 +101,17 @@ bool ofApp::wait_for_face(){
 
     if (res2.load(face_filename, settings))
     {
+        res2.setImageType(OF_IMAGE_GRAYSCALE);
         res = res2;
 
         res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
-        res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
         res.update();
+
+        res.save("debug2_" + ofGetTimestampString() + ".png");
 
         dither.dither_ordered(res, res, 8);
 
+        res.save("debug3_" + ofGetTimestampString() + ".png");
         res.getPixelsRef().resize(IMGX,IMGY,OF_INTERPOLATE_NEAREST_NEIGHBOR);
 
         res.update();

@@ -24,15 +24,12 @@ class ofApp : public ofBaseApp {
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-    // void urlResponse(ofHttpResponse &httpResponse);
-
     ofImage res;
     ofImage res2;
     ofImage bg;
 
     ofxDither dither;
 
-    // ofTrueTypeFont  verdana14;
     ofTrueTypeFont  pdu14;
 
 private:
