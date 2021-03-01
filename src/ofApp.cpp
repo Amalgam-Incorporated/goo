@@ -102,16 +102,19 @@ bool ofApp::wait_for_face(){
     if (res2.load(face_filename, settings))
     {
         res2.setImageType(OF_IMAGE_GRAYSCALE);
-        res = res2;
 
-        res.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
-        res.update();
+        res2.getPixelsRef().resize(IMGX/x_r,IMGY/y_r, OF_INTERPOLATE_NEAREST_NEIGHBOR);
+        res2.update();
 
-        res.save("debug2_" + ofGetTimestampString() + ".png");
+        string timestring = ofGetTimestampString();
+        std::cout << "v 1.93: " << timestring << "\n";
 
-        dither.dither_ordered(res, res, 8);
+        res2.save("debug_" + timestring + "_a.png");
 
-        res.save("debug3_" + ofGetTimestampString() + ".png");
+        dither.dither_ordered(res2, res, 8);
+
+        res2.save("debug_" + timestring + "_b.png");
+
         res.getPixelsRef().resize(IMGX,IMGY,OF_INTERPOLATE_NEAREST_NEIGHBOR);
 
         res.update();
@@ -143,7 +146,7 @@ bool ofApp::show_face(){
 void ofApp::band_control(int band, const char* msg){
     // Each servo has an endpoint of the format: [root]/hardware/servos/[servoNumber]/[command]
 
-    printf("band %i %s\n", band, msg);
+    // printf("band %i %s\n", band, msg);
 
     ofHttpRequest request;
 
@@ -158,8 +161,8 @@ void ofApp::band_control(int band, const char* msg){
     ofURLFileLoader http;
     auto response = http.handleRequest(request);
 
-    ofLogNotice() << response.status << std::endl;
-    ofLogNotice() << response.data.getText() << std::endl;
+    // ofLogNotice() << response.status << std::endl;
+    // ofLogNotice() << response.data.getText() << std::endl;
 
 }
 
